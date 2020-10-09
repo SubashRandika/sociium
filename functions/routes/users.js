@@ -15,7 +15,7 @@ router.post('/image', (req, res) => {
 	let imageToBeUploaded = {};
 
 	busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-		logger.debug(`${filename} accepted by busboy.`);
+		logger.debug(`${filename} accepting by busboy.`);
 
 		if (!['image/png', 'image/jpeg'].includes(mimetype)) {
 			logger.error(`${mimetype} type not supported.`);
@@ -34,11 +34,11 @@ router.post('/image', (req, res) => {
 		imageToBeUploaded = { filePath, mimetype };
 		file.pipe(fs.createWriteStream(filePath));
 
-		logger.debug(`${imageToBeUploaded} ready to upload.`);
+		logger.debug(`${imageToBeUploaded} prepared to upload.`);
 	});
 
 	busboy.on('finish', () => {
-		logger.debug('starting to upload into firebase.');
+		logger.debug('starting to upload into firestorage.');
 
 		fbAdmin
 			.storage()

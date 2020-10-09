@@ -83,9 +83,15 @@ const validateSignUpUser = (user) => {
 };
 
 router.post('/', (req, res) => {
+	logger.debug('POST - /signup reached.');
+
 	const { error } = validateSignUpUser(req.body);
 
 	if (error) {
+		logger.error(
+			`user signup validation failed at ${error.details[0].path[0]} due to ${error.details[0].message}`
+		);
+
 		return res.status(400).send({
 			code: 400,
 			field: error.details[0].path[0],
@@ -102,12 +108,16 @@ router.post('/', (req, res) => {
 		.get()
 		.then((doc) => {
 			if (doc.exists) {
+				logger.debug('User already exists.');
+
 				return res.status(400).send({
 					code: 400,
 					field: 'handle',
 					message: 'User already signup.'
 				});
 			} else {
+				logger.debug('User creating in firebase authentication.');
+
 				return firebase
 					.auth()
 					.createUserWithEmailAndPassword(
@@ -117,6 +127,8 @@ router.post('/', (req, res) => {
 			}
 		})
 		.then((data) => {
+			logger.debug('User token receiving.');
+
 			userId = data.user.uid;
 			return data.user.getToken();
 		})
@@ -130,9 +142,13 @@ router.post('/', (req, res) => {
 				createdAt: new Date().toISOString()
 			};
 
+			logger.debug('User registering in firestore.');
+
 			return db.doc(`/users/${newUser.handle}`).set(userCredentials);
 		})
 		.then(() => {
+			logger.debug('User created in firestore.');
+
 			return res.status(201).send({ code: 201, token });
 		})
 		.catch((err) => {

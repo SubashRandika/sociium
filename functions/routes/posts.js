@@ -4,6 +4,8 @@ const { db } = require('../utils/firebaseAdmin');
 const logger = require('../utils/logger');
 
 router.post('/', (req, res) => {
+	logger.debug('POST - /posts reached.');
+
 	const newPost = {
 		...req.body,
 		user: req.signin.user,
@@ -13,6 +15,8 @@ router.post('/', (req, res) => {
 	db.collection('posts')
 		.add(newPost)
 		.then((doc) => {
+			logger.debug(`post: ${doc.id} created.`);
+
 			res.status(201).send({
 				code: 201,
 				message: `Post: ${doc.id} created successfully`
@@ -29,20 +33,24 @@ router.post('/', (req, res) => {
 });
 
 router.get('/', (req, res) => {
+	logger.debug('GET - /posts path reached.');
+
 	db.collection('posts')
 		.orderBy('createdAt', 'desc')
 		.get()
 		.then((querySnapshot) => {
-			let post = [];
+			let posts = [];
 
 			querySnapshot.forEach((doc) => {
-				post.push({
+				posts.push({
 					postId: doc.id,
 					...doc.data()
 				});
 			});
 
-			res.status(200).send(post);
+			logger.debug(`${posts.length} posts received.`);
+
+			res.status(200).send(posts);
 		})
 		.catch((err) => {
 			logger.error(`Cannot get the posts: ${err}`);

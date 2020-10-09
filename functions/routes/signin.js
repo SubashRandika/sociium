@@ -33,9 +33,15 @@ const validateSignInUser = (user) => {
 };
 
 router.post('/', (req, res) => {
+	logger.debug('POST - /signin reached.');
+
 	const { error } = validateSignInUser(req.body);
 
 	if (error) {
+		logger.error(
+			`user signin validation failed at ${error.details[0].path[0]} due to ${error.details[0].message}`
+		);
+
 		return res.status(400).send({
 			code: 400,
 			field: error.details[0].path[0],
@@ -53,6 +59,8 @@ router.post('/', (req, res) => {
 			return data.user.getIdToken();
 		})
 		.then((token) => {
+			logger.debug('user token receiving.');
+
 			return res.status(200).send({ code: 200, token });
 		})
 		.catch((err) => {
