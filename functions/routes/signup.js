@@ -102,7 +102,6 @@ router.post('/', (req, res) => {
 	const { email, password, confirmPassword, handle } = req.body;
 	const newUser = { email, password, confirmPassword, handle };
 	let token, userId;
-	const noProfileImage = 'default_profile_image.png';
 
 	db.doc(`/users/${newUser.handle}`)
 		.get()
@@ -138,7 +137,7 @@ router.post('/', (req, res) => {
 				userId,
 				handle: newUser.handle,
 				email: newUser.email,
-				imageUrl: `https://firebasestorage.googleapis.com/v0/b/${fbConfig.storageBucket}/o/${noProfileImage}?alt=media`,
+				imageUrl: '',
 				createdAt: new Date().toISOString()
 			};
 
