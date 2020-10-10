@@ -14,6 +14,10 @@ const validateSignInUser = (user) => {
 					switch (err.type) {
 						case 'any.empty':
 							return { message: 'cannot be empty.' };
+						default:
+							return {
+								message: `${err.message}`
+							};
 					}
 				});
 			}),
@@ -24,6 +28,10 @@ const validateSignInUser = (user) => {
 					switch (err.type) {
 						case 'any.empty':
 							return { message: 'cannot be empty.' };
+						default:
+							return {
+								message: `${err.message}`
+							};
 					}
 				});
 			})

@@ -19,6 +19,10 @@ const validateSignUpUser = (user) => {
 							return {
 								message: 'should be valid one.'
 							};
+						default:
+							return {
+								message: `${err.message}`
+							};
 					}
 				});
 			}),
@@ -43,6 +47,10 @@ const validateSignUpUser = (user) => {
 								message:
 									'must include uppercase, lowercase, digit and special characters without whitespaces.'
 							};
+						default:
+							return {
+								message: `${err.message}`
+							};
 					}
 				});
 			}),
@@ -59,6 +67,10 @@ const validateSignUpUser = (user) => {
 							return {
 								message: 'must match with the password.'
 							};
+						default:
+							return {
+								message: `${err.message}`
+							};
 					}
 				});
 			}),
@@ -73,6 +85,10 @@ const validateSignUpUser = (user) => {
 						case 'string.min':
 							return {
 								message: 'must have at least 4 characters.'
+							};
+						default:
+							return {
+								message: `${err.message}`
 							};
 					}
 				});
