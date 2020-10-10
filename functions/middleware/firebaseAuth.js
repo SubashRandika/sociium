@@ -3,7 +3,7 @@ const router = express.Router();
 const { db, fbAdmin } = require('../utils/firebaseAdmin');
 const logger = require('../utils/logger');
 
-const firebaseAuth = (req, res) => {
+const firebaseAuth = (req, res, next) => {
 	const { authorization } = req.headers;
 	let idToken;
 
