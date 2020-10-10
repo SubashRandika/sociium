@@ -3,13 +3,13 @@ const { createLogger, format, transports } = require('winston');
 const { combine, splat, timestamp, printf } = format;
 
 const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
-	let message = `${timestamp} [${level}] : ${message} `;
+	let completeMessage = `${timestamp} [${level}] : ${message} `;
 
 	if (metadata) {
-		message += JSON.stringify(metadata);
+		completeMessage += JSON.stringify(metadata);
 	}
 
-	return message;
+	return completeMessage;
 });
 
 const logger = createLogger({
