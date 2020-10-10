@@ -45,6 +45,7 @@ router.post('/image', (req, res) => {
 			.bucket()
 			.upload(imageToBeUploaded.filePath, {
 				resumable: false,
+				destination: `${req.signin.user}/`,
 				metadata: {
 					metadata: {
 						contentType: imageToBeUploaded.mimetype
