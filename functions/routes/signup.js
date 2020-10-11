@@ -1,14 +1,14 @@
 const express = require('express');
 const Joi = require('joi');
 const router = express.Router();
-const { firebase, db, fbConfig } = require('../utils/firebaseAdmin');
+const { firebase, db } = require('../utils/firebaseAdmin');
 const logger = require('../utils/logger');
 
 const validateSignUpUser = (user) => {
 	const schema = {
 		email: Joi.string()
 			.trim()
-			.email({ minDomainAtoms: 2 })
+			.email({ minDomainSegments: 2 })
 			.required()
 			.error((errors) => {
 				return errors.map((err) => {
