@@ -45,7 +45,7 @@ router.post('/image', (req, res) => {
 			.bucket()
 			.upload(imageToBeUploaded.filePath, {
 				resumable: false,
-				destination: `${req.signin.user}/`,
+				destination: `${req.signin.uid}/${imageFileName}`,
 				metadata: {
 					metadata: {
 						contentType: imageToBeUploaded.mimetype
@@ -55,7 +55,11 @@ router.post('/image', (req, res) => {
 			.then(() => {
 				logger.debug(`updating user: ${req.signin.user} image url.`);
 
-				const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${fbConfig.storageBucket}/o/${imageFileName}?alt=media`;
+				const uploadedPath = encodeURIComponent(
+					`${req.signin.uid}/${imageFileName}`
+				);
+				const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${fbConfig.storageBucket}/o/${uploadedPath}?alt=media`;
+
 				return db.doc(`users/${req.signin.user}`).update({ imageUrl });
 			})
 			.then(() => {
