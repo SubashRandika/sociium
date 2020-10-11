@@ -5,7 +5,7 @@ const { firebase, db } = require('../utils/firebaseAdmin');
 const logger = require('../utils/logger');
 
 const validateSignUpUser = (user) => {
-	const schema = {
+	const schema = Joi.object({
 		email: Joi.string()
 			.trim()
 			.email({ minDomainSegments: 2 })
@@ -93,9 +93,9 @@ const validateSignUpUser = (user) => {
 					}
 				});
 			})
-	};
+	});
 
-	return Joi.validate(user, schema);
+	return schema.validate(user);
 };
 
 router.post('/', (req, res) => {
@@ -145,7 +145,7 @@ router.post('/', (req, res) => {
 			logger.debug('User token receiving.');
 
 			userId = data.user.uid;
-			return data.user.getToken();
+			return data.user.getIdToken();
 		})
 		.then((userToken) => {
 			token = userToken;

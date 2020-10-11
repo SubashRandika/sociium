@@ -5,7 +5,7 @@ const { firebase } = require('../utils/firebaseAdmin');
 const logger = require('../utils/logger');
 
 const validateSignInUser = (user) => {
-	const schema = {
+	const schema = Joi.object({
 		email: Joi.string()
 			.trim()
 			.required()
@@ -35,9 +35,9 @@ const validateSignInUser = (user) => {
 					}
 				});
 			})
-	};
+	});
 
-	return Joi.validate(user, schema);
+	return schema.validate(user);
 };
 
 router.post('/', (req, res) => {

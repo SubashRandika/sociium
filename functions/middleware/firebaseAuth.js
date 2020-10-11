@@ -18,15 +18,20 @@ const firebaseAuth = (req, res, next) => {
 		.auth()
 		.verifyIdToken(idToken)
 		.then((decodedToken) => {
-			const { uid } = decodedToken;
+			logger.debug(
+				`Token successfully verified for userId ${decodedToken.uid}`
+			);
+			req.signin = decodedToken;
 
 			return db
 				.collection('users')
-				.where('userId', '==', uid)
+				.where('userId', '==', req.signin.uid)
 				.limit(1)
 				.get();
 		})
 		.then((data) => {
+			logger.debug('Attaching verified user for next request.');
+
 			req.signin.user = data.docs[0].data().handle;
 			return next();
 		})

@@ -13,6 +13,7 @@ const logFormat = printf(({ level, message, timestamp, ...metadata }) => {
 });
 
 const logger = createLogger({
+	level: 'debug',
 	format: combine(format.colorize(), splat(), timestamp(), logFormat),
 	transports: [new transports.Console()],
 	timestamp: function () {
