@@ -74,7 +74,7 @@ const validateSignUpUser = (user) => {
 					}
 				});
 			}),
-		handle: Joi.string()
+		userName: Joi.string()
 			.min(4)
 			.required()
 			.error((errors) => {
@@ -115,20 +115,21 @@ router.post('/', (req, res) => {
 		});
 	}
 
-	const { email, password, confirmPassword, handle } = req.body;
-	const newUser = { email, password, confirmPassword, handle };
+	const { email, password, confirmPassword, userName } = req.body;
+	const newUser = { email, password, confirmPassword, userName };
 	let token, userId;
 
-	db.doc(`/users/${newUser.handle}`)
+	db.collection('users')
+		.where('email', '==', email)
 		.get()
-		.then((doc) => {
-			if (doc.exists) {
+		.then((userSnapshot) => {
+			if (!userSnapshot.empty) {
 				logger.debug('User already exists.');
 
 				return res.status(400).send({
 					code: 400,
-					field: 'handle',
-					message: 'User already signup.'
+					field: 'email',
+					message: `User already signup with the ${email}`
 				});
 			} else {
 				logger.debug('User creating in firebase authentication.');
@@ -150,8 +151,7 @@ router.post('/', (req, res) => {
 		.then((userToken) => {
 			token = userToken;
 			const userCredentials = {
-				userId,
-				handle: newUser.handle,
+				userName: newUser.userName,
 				email: newUser.email,
 				imageUrl: '',
 				createdAt: new Date().toISOString()
@@ -159,7 +159,7 @@ router.post('/', (req, res) => {
 
 			logger.debug('User registering in firestore.');
 
-			return db.doc(`/users/${newUser.handle}`).set(userCredentials);
+			return db.doc(`/users/${userId}`).set(userCredentials);
 		})
 		.then(() => {
 			logger.debug('User created in firestore.');
@@ -173,7 +173,7 @@ router.post('/', (req, res) => {
 				return res.status(400).send({
 					code: 400,
 					field: 'email',
-					message: `User already signup with the email: ${newUser.email}`
+					message: `User already signup with ${newUser.email}`
 				});
 			} else {
 				return res.status(500).send({ code: 500, message: err.code });

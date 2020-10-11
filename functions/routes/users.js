@@ -60,7 +60,7 @@ router.post('/image', (req, res) => {
 				);
 				const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${fbConfig.storageBucket}/o/${uploadedPath}?alt=media`;
 
-				return db.doc(`users/${req.signin.user}`).update({ imageUrl });
+				return db.doc(`users/${req.signin.uid}`).update({ imageUrl });
 			})
 			.then(() => {
 				logger.debug('Image uploaded successfully.');

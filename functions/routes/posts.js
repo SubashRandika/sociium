@@ -8,7 +8,7 @@ router.post('/', (req, res) => {
 
 	const newPost = {
 		...req.body,
-		user: req.signin.user,
+		userId: req.signin.uid,
 		createdAt: new Date().toISOString()
 	};
 
