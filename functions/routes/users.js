@@ -8,7 +8,7 @@ const os = require('os');
 const fs = require('fs');
 
 router.post('/image', (req, res) => {
-	logger.debug(`${req.path} reached.`);
+	logger.debug('POST - /users/image reached.');
 
 	const busboy = new Busboy({ headers: req.headers });
 	let imageFileName;
@@ -81,7 +81,7 @@ router.post('/image', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-	logger.debug('users/ reached.');
+	logger.debug('POST - /users reached.');
 
 	const { bio, website, location } = req.body;
 	const userDetails = {};
@@ -118,6 +118,48 @@ router.post('/', (req, res) => {
 			return res
 				.status(500)
 				.send({ code: 500, message: 'User details update failed' });
+		});
+});
+
+router.get('/', (req, res) => {
+	logger.debug('GET - /users reached.');
+
+	const userData = {};
+
+	db.doc(`users/${req.signin.uid}`)
+		.get()
+		.then((doc) => {
+			if (doc.exists) {
+				logger.debug(
+					`getting user credentials for user: ${req.signin.uid}`
+				);
+
+				userData.credentials = doc.data();
+				userData.credentials.userId = req.signin.uid;
+
+				return db
+					.collection('likes')
+					.where('userId', '==', req.signin.uid)
+					.get();
+			}
+		})
+		.then((data) => {
+			logger.debug(`getting user likes for user: ${req.signin.uid}`);
+
+			userData.likes = [];
+			data.forEach((doc) => {
+				userData.likes.push(doc.data());
+			});
+
+			res.status(200).send(userData);
+		})
+		.catch((err) => {
+			logger.error(`Unable to get user data due to: ${err}`);
+
+			res.status(500).send({
+				code: 500,
+				message: 'Unable get user data'
+			});
 		});
 });
 
