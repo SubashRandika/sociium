@@ -80,4 +80,45 @@ router.post('/image', (req, res) => {
 	busboy.end(req.rawBody);
 });
 
+router.post('/', (req, res) => {
+	logger.debug('users/ reached.');
+
+	const { bio, website, location } = req.body;
+	const userDetails = {};
+
+	if (bio.trim()) {
+		userDetails.bio = bio.trim();
+	}
+
+	if (website.trim()) {
+		if (!website.trim().startsWith('http')) {
+			userDetails.website = `http://${website}`;
+		} else {
+			userDetails.website = website;
+		}
+	}
+
+	if (location.trim()) {
+		userDetails.location = location.trim();
+	}
+
+	db.doc(`users/${req.signin.uid}`)
+		.update(userDetails)
+		.then(() => {
+			logger.debug(`updated user ${req.signin.uid} details.`);
+
+			return res.status(200).send({
+				code: 200,
+				message: 'User details successfully updated.'
+			});
+		})
+		.catch((err) => {
+			logger.error(`Unable to update user details due to: ${err}`);
+
+			return res
+				.status(500)
+				.send({ code: 500, message: 'User details update failed' });
+		});
+});
+
 module.exports = router;
