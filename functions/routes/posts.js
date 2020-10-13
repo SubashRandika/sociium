@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../utils/firebaseAdmin');
-const { data } = require('../utils/logger');
 const logger = require('../utils/logger');
 
 // create a new post
@@ -71,7 +70,6 @@ router.get('/:postId', (req, res) => {
 
 	let postData = {};
 	const { postId } = req.params;
-	console.log(postId);
 
 	db.doc(`posts/${postId}`)
 		.get()
@@ -98,7 +96,7 @@ router.get('/:postId', (req, res) => {
 
 			postData.comments = [];
 			data.forEach((doc) => {
-				postData.comments.push(doc.data());
+				postData.comments.push({ commentId: doc.id, ...doc.data() });
 			});
 
 			return res.status(200).send(postData);
@@ -109,6 +107,57 @@ router.get('/:postId', (req, res) => {
 			res.status(500).send({
 				code: 500,
 				message: 'cannot get post data'
+			});
+		});
+});
+
+// create a comment on a post
+router.post('/:postId/comment', (req, res) => {
+	logger.debug('POST - /posts/:postId/comment reached');
+
+	const { body } = req.body;
+	const { postId } = req.params;
+	const { uid, imageUrl } = req.signin;
+
+	if (body.trim() === '') {
+		return res
+			.status(400)
+			.send({ code: 400, message: 'cannot create empty comment' });
+	}
+
+	const newComment = {
+		body,
+		postId,
+		userId: uid,
+		userImage: imageUrl,
+		createdAt: new Date().toISOString()
+	};
+
+	db.doc(`posts/${postId}`)
+		.get()
+		.then((doc) => {
+			if (!doc.exists) {
+				return res.status(404).send({
+					code: 404,
+					message: `unable to find post: ${postId}`
+				});
+			}
+
+			logger.debug(`getting existing post to comment`);
+
+			return db.collection('comments').add(newComment);
+		})
+		.then((doc) => {
+			logger.debug(`comment: ${doc.id} successfully added`);
+
+			res.status(200).send({ commentId: doc.id, ...newComment });
+		})
+		.catch((err) => {
+			logger.error(`adding comment to post is failed due to: ${err}`);
+
+			res.status(500).send({
+				code: 500,
+				message: 'Unable to add comment on post'
 			});
 		});
 });

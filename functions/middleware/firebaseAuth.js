@@ -25,9 +25,10 @@ const firebaseAuth = (req, res, next) => {
 
 			return db.doc(`users/${req.signin.uid}`).get();
 		})
-		.then(() => {
+		.then((doc) => {
 			logger.debug('Passing verified user for next request.');
 
+			req.signin.imageUrl = doc.data().imageUrl;
 			return next();
 		})
 		.catch((err) => {
