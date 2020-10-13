@@ -10,7 +10,10 @@ router.post('/', (req, res) => {
 	const newPost = {
 		...req.body,
 		userId: req.signin.uid,
-		createdAt: new Date().toISOString()
+		userImage: req.signin.imageUrl,
+		createdAt: new Date().toISOString(),
+		likeCount: 0,
+		commentCount: 0
 	};
 
 	db.collection('posts')
@@ -18,10 +21,7 @@ router.post('/', (req, res) => {
 		.then((doc) => {
 			logger.debug(`post: ${doc.id} created.`);
 
-			res.status(201).send({
-				code: 201,
-				message: `Post: ${doc.id} created successfully`
-			});
+			res.status(201).send({ postId: doc.id, ...newPost });
 		})
 		.catch((err) => {
 			logger.error(`Post creation failed: ${err}`);
