@@ -9,7 +9,7 @@ router.post('/', (req, res) => {
 
 	const newPost = {
 		...req.body,
-		userId: req.signin.uid,
+		userName: req.signin.userName,
 		userImage: req.signin.imageUrl,
 		createdAt: new Date().toISOString(),
 		likeCount: 0,
@@ -117,7 +117,7 @@ router.post('/:postId/comment', (req, res) => {
 
 	const { body } = req.body;
 	const { postId } = req.params;
-	const { uid, imageUrl } = req.signin;
+	const { userName, imageUrl } = req.signin;
 
 	if (body.trim() === '') {
 		return res
@@ -128,7 +128,7 @@ router.post('/:postId/comment', (req, res) => {
 	const newComment = {
 		body,
 		postId,
-		userId: uid,
+		userName,
 		userImage: imageUrl,
 		createdAt: new Date().toISOString()
 	};

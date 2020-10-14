@@ -139,7 +139,7 @@ router.get('/', (req, res) => {
 
 				return db
 					.collection('likes')
-					.where('userId', '==', req.signin.uid)
+					.where('userName', '==', req.signin.userName)
 					.get();
 			}
 		})

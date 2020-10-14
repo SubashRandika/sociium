@@ -28,6 +28,7 @@ const firebaseAuth = (req, res, next) => {
 		.then((doc) => {
 			logger.debug('Passing verified user for next request.');
 
+			req.signin.userName = doc.data().userName;
 			req.signin.imageUrl = doc.data().imageUrl;
 			return next();
 		})
