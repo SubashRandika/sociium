@@ -143,7 +143,14 @@ router.post('/:postId/comment', (req, res) => {
 				});
 			}
 
-			logger.debug(`getting existing post to comment`);
+			logger.debug('updating comment count');
+
+			return doc.ref.update({
+				commentCount: doc.data().commentCount + 1
+			});
+		})
+		.then(() => {
+			logger.debug('adding new comments record');
 
 			return db.collection('comments').add(newComment);
 		})
