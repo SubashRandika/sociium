@@ -162,4 +162,142 @@ router.post('/:postId/comment', (req, res) => {
 		});
 });
 
+// like the post
+router.get('/:postId/like', (req, res) => {
+	logger.debug('GET - /posts/:postId/like reached');
+
+	const { postId } = req.params;
+	const { userName } = req.signin;
+	let postData;
+	const postDocument = db.doc(`/posts/${postId}`);
+
+	postDocument
+		.get()
+		.then((doc) => {
+			if (doc.exists) {
+				logger.debug(`getting post document data`);
+
+				postData = doc.data();
+				postData.postId = doc.id;
+
+				return db
+					.collection('likes')
+					.where('userName', '==', userName)
+					.where('postId', '==', postId)
+					.limit(1)
+					.get();
+			} else {
+				logger.warn(`cannot find a post: ${postId}`);
+
+				return res
+					.status(404)
+					.send({ code: 404, message: `post: ${postId} not found` });
+			}
+		})
+		.then(async (data) => {
+			if (data.empty) {
+				logger.debug('user liking the post');
+
+				await db
+					.collection('likes')
+					.add({ postId: postId, userName: userName });
+
+				logger.debug('increasing the number of likes');
+
+				postData.likeCount++;
+
+				await postDocument.update({
+					likeCount: postData.likeCount
+				});
+
+				logger.debug('post updated with latest no of likes');
+
+				return res.status(200).send(postData);
+			} else {
+				logger.warn('user already liked');
+
+				res.status(400).send({
+					code: 400,
+					message: 'you already liked the post'
+				});
+			}
+		})
+		.catch((err) => {
+			logger.error(`liking post is failed due to: ${err}`);
+
+			res.status(500).send({
+				code: 500,
+				message: 'unable to like the post'
+			});
+		});
+});
+
+// unlike the post
+router.get('/:postId/unlike', (req, res) => {
+	logger.debug('GET - /posts/:postId/unlike reached');
+
+	const { postId } = req.params;
+	const { userName } = req.signin;
+	let postData;
+	const postDocument = db.doc(`/posts/${postId}`);
+
+	postDocument
+		.get()
+		.then((doc) => {
+			if (doc.exists) {
+				logger.debug(`getting post document data`);
+
+				postData = doc.data();
+				postData.postId = doc.id;
+
+				return db
+					.collection('likes')
+					.where('userName', '==', userName)
+					.where('postId', '==', postId)
+					.limit(1)
+					.get();
+			} else {
+				logger.warn(`cannot find a post: ${postId}`);
+
+				return res
+					.status(404)
+					.send({ code: 404, message: `post: ${postId} not found` });
+			}
+		})
+		.then(async (data) => {
+			if (data.empty) {
+				logger.warn('user not liked yet');
+
+				res.status(400).send({
+					code: 400,
+					message: 'you not liked the post'
+				});
+			} else {
+				logger.debug('user disliking the post');
+
+				await db.doc(`/likes/${data.docs[0].id}`).delete();
+
+				logger.debug('decreasing the number of likes');
+
+				postData.likeCount--;
+
+				await postDocument.update({
+					likeCount: postData.likeCount
+				});
+
+				logger.debug('post updated with latest no of likes');
+
+				return res.status(200).send(postData);
+			}
+		})
+		.catch((err) => {
+			logger.error(`disliking post is failed due to: ${err}`);
+
+			res.status(500).send({
+				code: 500,
+				message: 'unable to unlike the post'
+			});
+		});
+});
+
 module.exports = router;
