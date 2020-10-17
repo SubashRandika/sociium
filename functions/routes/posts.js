@@ -277,7 +277,7 @@ router.get('/:postId/unlike', (req, res) => {
 
 				res.status(400).send({
 					code: 400,
-					message: 'you not liked the post'
+					message: 'you have not liked the post'
 				});
 			} else {
 				logger.debug('user disliking the post');
