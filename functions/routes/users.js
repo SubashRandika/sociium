@@ -143,12 +143,31 @@ router.get('/', (req, res) => {
 					.get();
 			}
 		})
-		.then((data) => {
-			logger.debug(`getting user likes for user: ${req.signin.uid}`);
+		.then((likesSnapshot) => {
+			logger.debug(`getting likes of user: ${req.signin.uid}`);
 
 			userData.likes = [];
-			data.forEach((doc) => {
+			likesSnapshot.forEach((doc) => {
 				userData.likes.push(doc.data());
+			});
+
+			return db
+				.collection('notifications')
+				.where('recipient', '==', req.signin.userName)
+				.orderBy('createdAt', 'desc')
+				.limit(10)
+				.get();
+		})
+		.then((notificationsSnapshot) => {
+			logger.debug(`getting notifications of user: ${req.signin.uid}`);
+
+			userData.notifications = [];
+
+			notificationsSnapshot.forEach((doc) => {
+				userData.notifications.push({
+					notificationId: doc.id,
+					...doc.data()
+				});
 			});
 
 			res.status(200).send(userData);
