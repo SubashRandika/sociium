@@ -176,7 +176,10 @@ router.post('/', (req, res) => {
 					message: `User already signup with ${newUser.email}`
 				});
 			} else {
-				return res.status(500).send({ code: 500, message: err.code });
+				return res.status(500).send({
+					code: 500,
+					message: 'signup failed. please try again'
+				});
 			}
 		});
 });

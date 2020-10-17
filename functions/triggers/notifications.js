@@ -10,12 +10,13 @@ exports.createOnLikeThePost = functions.firestore
 		const { postId, userName } = snapshot.data();
 		const likeId = context.params.likeId;
 
-		db.doc(`posts/${postId}`)
+		return db
+			.doc(`posts/${postId}`)
 			.get()
 			.then((doc) => {
 				logger.debug('getting post data of liked post');
 
-				if (doc.exists) {
+				if (doc.exists && doc.data().userName !== userName) {
 					logger.debug('updating notification data with like id');
 
 					return db.doc(`notifications/${likeId}`).set({
@@ -28,17 +29,10 @@ exports.createOnLikeThePost = functions.firestore
 					});
 				}
 			})
-			.then(() => {
-				logger.debug(
-					'adding notification on like to the post is successful'
-				);
-				return;
-			})
 			.catch((err) => {
 				logger.error(
 					`adding notification on like to the post is failed due to: ${err}`
 				);
-				return;
 			});
 	});
 
@@ -50,12 +44,13 @@ exports.createWhenCommentOnPost = functions.firestore
 		const { postId, userName } = snapshot.data();
 		const commentId = context.params.commentId;
 
-		db.doc(`posts/${postId}`)
+		return db
+			.doc(`posts/${postId}`)
 			.get()
 			.then((doc) => {
 				logger.debug('getting post data of commented post');
 
-				if (doc.exists) {
+				if (doc.exists && doc.data().userName !== userName) {
 					logger.debug('updating notification data with comment id');
 
 					return db.doc(`notifications/${commentId}`).set({
@@ -68,17 +63,10 @@ exports.createWhenCommentOnPost = functions.firestore
 					});
 				}
 			})
-			.then(() => {
-				logger.debug(
-					'adding notification on comment to post the is successful'
-				);
-				return;
-			})
 			.catch((err) => {
 				logger.error(
 					`adding notification on comment to post the is failed due to: ${err}`
 				);
-				return;
 			});
 	});
 
@@ -87,16 +75,10 @@ exports.deleteWhenUnlikeThePost = functions.firestore
 	.onDelete((snapshot, context) => {
 		logger.debug('onDelete triggered for unlike the post');
 
-		db.doc(`notifications/${context.params.likeId}`)
+		return db
+			.doc(`notifications/${context.params.likeId}`)
 			.delete()
-			.then(() => {
-				logger.debug(
-					`notification successfully deleted for like: ${snapshot.id}`
-				);
-				return;
-			})
 			.catch((err) => {
 				logger.error(`notification deletion failed due to: ${err}`);
-				return;
 			});
 	});
