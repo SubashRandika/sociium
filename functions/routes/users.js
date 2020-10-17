@@ -7,12 +7,14 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
+// upload user profile image
 router.post('/image', (req, res) => {
 	logger.debug('POST - /users/image reached.');
 
 	const busboy = new Busboy({ headers: req.headers });
 	let imageFileName;
 	let imageToBeUploaded = {};
+	const { uid, userName } = req.signin;
 
 	busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
 		logger.debug(`${filename} accepting by busboy.`);
@@ -45,7 +47,7 @@ router.post('/image', (req, res) => {
 			.bucket()
 			.upload(imageToBeUploaded.filePath, {
 				resumable: false,
-				destination: `${req.signin.uid}/${imageFileName}`,
+				destination: `${uid}/${imageFileName}`,
 				metadata: {
 					metadata: {
 						contentType: imageToBeUploaded.mimetype
@@ -53,14 +55,14 @@ router.post('/image', (req, res) => {
 				}
 			})
 			.then(() => {
-				logger.debug(`updating user: ${req.signin.user} image url.`);
+				logger.debug(`updating user: ${userName} image url.`);
 
 				const uploadedPath = encodeURIComponent(
-					`${req.signin.uid}/${imageFileName}`
+					`${uid}/${imageFileName}`
 				);
 				const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${fbConfig.storageBucket}/o/${uploadedPath}?alt=media`;
 
-				return db.doc(`users/${req.signin.uid}`).update({ imageUrl });
+				return db.doc(`users/${uid}`).update({ imageUrl });
 			})
 			.then(() => {
 				logger.debug('Image uploaded successfully.');
@@ -80,11 +82,13 @@ router.post('/image', (req, res) => {
 	busboy.end(req.rawBody);
 });
 
+// create a new user
 router.post('/', (req, res) => {
 	logger.debug('POST - /users reached.');
 
 	const { bio, website, location } = req.body;
 	const userDetails = {};
+	const { uid } = req.signin;
 
 	if (bio.trim()) {
 		userDetails.bio = bio.trim();
@@ -102,10 +106,10 @@ router.post('/', (req, res) => {
 		userDetails.location = location.trim();
 	}
 
-	db.doc(`users/${req.signin.uid}`)
+	db.doc(`users/${uid}`)
 		.update(userDetails)
 		.then(() => {
-			logger.debug(`updated user ${req.signin.uid} details.`);
+			logger.debug(`updated user: ${uid} details.`);
 
 			return res.status(200).send({
 				code: 200,
@@ -121,30 +125,37 @@ router.post('/', (req, res) => {
 		});
 });
 
+// get signup user details
 router.get('/', (req, res) => {
 	logger.debug('GET - /users reached.');
 
 	const userData = {};
+	const { uid, userName } = req.signin;
 
-	db.doc(`users/${req.signin.uid}`)
+	db.doc(`users/${uid}`)
 		.get()
 		.then((doc) => {
 			if (doc.exists) {
-				logger.debug(
-					`getting user credentials for user: ${req.signin.uid}`
-				);
+				logger.debug(`getting user credentials for user: ${uid}`);
 
 				userData.credentials = doc.data();
-				userData.credentials.userId = req.signin.uid;
+				userData.credentials.userId = uid;
 
 				return db
 					.collection('likes')
-					.where('userName', '==', req.signin.userName)
+					.where('userName', '==', userName)
 					.get();
+			} else {
+				logger.warn(`user: ${userName} not found`);
+
+				return res.status(404).send({
+					code: 404,
+					message: 'user you looking is not found'
+				});
 			}
 		})
 		.then((likesSnapshot) => {
-			logger.debug(`getting likes of user: ${req.signin.uid}`);
+			logger.debug(`getting likes of user: ${uid}`);
 
 			userData.likes = [];
 			likesSnapshot.forEach((doc) => {
@@ -153,13 +164,13 @@ router.get('/', (req, res) => {
 
 			return db
 				.collection('notifications')
-				.where('recipient', '==', req.signin.userName)
+				.where('recipient', '==', userName)
 				.orderBy('createdAt', 'desc')
 				.limit(10)
 				.get();
 		})
 		.then((notificationsSnapshot) => {
-			logger.debug(`getting notifications of user: ${req.signin.uid}`);
+			logger.debug(`getting notifications of user: ${uid}`);
 
 			userData.notifications = [];
 
