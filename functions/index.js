@@ -5,6 +5,7 @@ const posts = require('./routes/posts');
 const signin = require('./routes/signin');
 const signup = require('./routes/signup');
 const users = require('./routes/users');
+const notificationsMarksRead = require('./routes/notifications');
 const userDetails = require('./routes/userDetails');
 const firebaseAuth = require('./middleware/firebaseAuth');
 const notifications = require('./triggers/notifications');
@@ -29,6 +30,9 @@ app.use('/users', firebaseAuth, users);
 
 // public route of users details
 app.use('/userDetails', userDetails);
+
+// notifications marks as read
+app.use('/notifications', firebaseAuth, notificationsMarksRead);
 
 exports.api = functions.https.onRequest(app);
 
