@@ -307,4 +307,50 @@ router.get('/:postId/unlike', (req, res) => {
 		});
 });
 
+router.delete('/:postId', (req, res) => {
+	logger.debug('DELETE - /posts/:postId reached');
+
+	const { postId } = req.params;
+	const postDocument = db.doc(`/posts/${postId}`);
+
+	postDocument
+		.get()
+		.then(async (doc) => {
+			if (!doc.exists) {
+				logger.warn(`cannot find the post: ${postId}`);
+
+				return res.status(404).send({
+					code: 404,
+					message: `post: ${postId} does not exist`
+				});
+			}
+
+			if (doc.data().userName !== req.signin.userName) {
+				logger.warn('user unauthorized to delete the post');
+
+				return res.status(403).send({
+					code: 403,
+					message: 'Unauthorized to delete this post'
+				});
+			} else {
+				await postDocument.delete();
+
+				logger.debug('post successfully deleted');
+
+				return res.status(200).send({
+					code: 200,
+					message: `post: ${postId} successfully deleted`
+				});
+			}
+		})
+		.catch((err) => {
+			logger.error(`delete the post failed due to ${err}`);
+
+			return res.status(500).send({
+				code: 500,
+				message: 'unable to delete the post'
+			});
+		});
+});
+
 module.exports = router;
