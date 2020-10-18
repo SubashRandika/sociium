@@ -10,6 +10,7 @@ const userDetails = require('./routes/userDetails');
 const firebaseAuth = require('./middleware/firebaseAuth');
 const notifications = require('./triggers/notifications');
 const cleanup = require('./triggers/cleanup');
+const updatePosts = require('./triggers/updatePosts');
 
 // built-in middlewares
 app.use(express.json());
@@ -36,5 +37,6 @@ app.use('/notifications', firebaseAuth, notificationsMarksRead);
 
 exports.api = functions.https.onRequest(app);
 
-exports.notification = notifications;
+exports.notify = notifications;
 exports.cleanup = cleanup;
+exports.updatePosts = updatePosts;

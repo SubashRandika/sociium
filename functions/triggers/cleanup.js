@@ -2,74 +2,70 @@ const functions = require('firebase-functions');
 const { db } = require('../utils/firebaseAdmin');
 const logger = require('../utils/logger');
 
-exports.likesAndCommentsWhenDeleteAPost = functions.firestore
+exports.likesCommentsNotificationsOnPostDeletion = functions.firestore
 	.document('posts/{postId}')
-	.onDelete((change, context) => {
-		logger.debug('onDelete triggered for post deletion');
+	.onDelete(async (snapshot, context) => {
+		logger.debug('Trigger[likesCommentsNotificationsOnPostDeletion] fired');
 
 		const postId = context.params.postId;
+		const batch = db.batch();
 
-		db.collection('likes')
-			.where('postId', '==', postId)
-			.get()
-			.then((likesSnapshot) => {
-				logger.debug('getting likes for post to delete');
+		try {
+			logger.debug('fetching all likes of deleted post');
 
-				if (likesSnapshot.empty) {
-					logger.warn('likes not available for the post');
-					return;
-				} else {
-					logger.debug('starting to delete likes of deleted post');
+			const likesSnapshot = await db
+				.collection('likes')
+				.where('postId', '==', postId)
+				.get();
 
-					const likesBatch = db.batch();
+			if (likesSnapshot.empty) {
+				logger.warn('likes are not available for the post');
+			} else {
+				logger.debug('batching all likes of deleted post');
 
-					likesSnapshot.forEach((doc) => {
-						likesBatch.delete(doc.ref);
-					});
+				likesSnapshot.forEach((likeDoc) => {
+					batch.delete(likeDoc.ref);
+				});
+			}
 
-					return likesBatch.commit();
-				}
-			})
-			.then(() => {
-				logger.debug('all likes related to post deletion successful');
-				return;
-			})
-			.catch((err) => {
-				logger.error(
-					`all likes related to post deletion failed due to: ${err}`
-				);
-				return;
-			});
+			logger.debug('fetching all comments of deleted post');
 
-		db.collection('comments')
-			.where('postId', '==', postId)
-			.get()
-			.then((commentsSnapshot) => {
-				logger.debug('getting likes for post to delete');
+			const commentsSnapshot = await db
+				.collection('comments')
+				.where('postId', '==', postId)
+				.get();
 
-				if (commentsSnapshot.empty) {
-					logger.warn('comments not available for the post');
-					return;
-				} else {
-					logger.debug('starting to delete comments of deleted post');
+			if (commentsSnapshot.empty) {
+				logger.warn('comments are not available for the post');
+			} else {
+				logger.debug('batching all comments of deleted post');
 
-					const commentsBatch = db.batch();
+				commentsSnapshot.forEach((commentDoc) => {
+					batch.delete(commentDoc.ref);
+				});
+			}
 
-					commentsSnapshot.forEach((doc) => {
-						commentsBatch.delete(doc.ref);
-					});
+			logger.debug('fetching all notifications of deleted post');
 
-					return commentsBatch.commit();
-				}
-			})
-			.then(() => {
-				logger.debug('all likes related to post deletion successful');
-				return;
-			})
-			.catch((err) => {
-				logger.error(
-					`all likes related to post deletion failed due to: ${err}`
-				);
-				return;
-			});
+			const notificationsSnapshot = await db
+				.collection('notifications')
+				.where('postId', '==', postId)
+				.get();
+
+			if (notificationsSnapshot.empty) {
+				logger.warn('notifications are not available for the post');
+			} else {
+				logger.debug('batching all notifications of deleted post');
+
+				notificationsSnapshot.forEach((notificationDoc) => {
+					batch.delete(notificationDoc.ref);
+				});
+			}
+
+			batch.commit();
+		} catch (err) {
+			logger.error(
+				`Trigger[likesCommentsNotificationsOnPostDeletion] failed due to: ${err}`
+			);
+		}
 	});
