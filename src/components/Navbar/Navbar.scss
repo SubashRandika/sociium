@@ -1,0 +1,65 @@
+.ant-layout-header.navbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background-color: #ffffff;
+	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.03), 0 1px 0 rgba(0, 0, 0, 0.03);
+
+	.logo_container {
+		display: flex;
+		align-items: center;
+		font-size: 25px;
+		font-weight: 600;
+		color: rgba(0, 0, 0, 0.87);
+		flex-grow: 1;
+
+		.logo_text {
+			margin-left: 10px;
+		}
+	}
+
+	.right_menu {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		flex-grow: 1;
+
+		.ant-btn-background-ghost.signin-btn {
+			border: 1px solid #0cc2aa;
+			padding-left: 25px;
+			padding-right: 25px;
+			color: #0cc2aa;
+			margin-right: 20px;
+
+			span {
+				font-weight: 600;
+			}
+
+			&:hover {
+				color: rgba(255, 255, 255, 0.87);
+				background: #0cc2aa !important;
+			}
+		}
+
+		.notification_icon {
+			font-size: 23px;
+			margin-right: 25px;
+			cursor: pointer;
+		}
+
+		.notification_counts > sup {
+			background-color: red;
+			color: #ffffff;
+			font-weight: 600;
+		}
+
+		.online_dot > sup {
+			width: 10px;
+			height: 10px;
+		}
+
+		.avatar {
+			cursor: pointer;
+		}
+	}
+}
