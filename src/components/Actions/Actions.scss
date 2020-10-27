@@ -1,0 +1,22 @@
+.action {
+	font-size: 15px;
+}
+
+.action.value {
+	font-weight: 600;
+}
+
+.ant-comment-actions > li:last-child {
+	border-left: 1px solid #f0f0f0;
+}
+
+.action.icon > span[aria-label='like'] {
+	color: #6887ff;
+	margin-right: 8px;
+}
+
+.action.icon > span[aria-label='message'] {
+	padding-left: 10px;
+	color: #f77a99;
+	margin-right: 8px;
+}

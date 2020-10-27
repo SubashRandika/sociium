@@ -1,0 +1,31 @@
+.ant-comment.post {
+	background-color: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15), 0 -1px 0px rgba(0, 0, 0, 0.02);
+	padding: 10px 20px 0 20px;
+	margin-bottom: 10px;
+}
+
+.post .ant-comment-content-author {
+	display: flex;
+	justify-content: space-between;
+}
+
+.ant-comment-actions > li > span {
+	display: flex;
+	justify-content: center;
+}
+
+.posted_user {
+	font-size: 15px;
+	text-transform: capitalize;
+	color: #6887ff !important;
+}
+
+.posted_user:hover {
+	color: #5bc0de !important;
+}
+
+.posted_date {
+	font-size: 12px;
+	color: #818a91 !important;
+}
