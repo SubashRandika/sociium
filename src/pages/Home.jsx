@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Layout, Row, Col } from 'antd';
+import { Layout, Row, Col, Skeleton } from 'antd';
 import './Home.scss';
 
 import Navbar from '../components/Navbar/Navbar';
@@ -33,13 +33,18 @@ function Home() {
 						Profile
 					</Col>
 					<Col xs={24} sm={24} md={24} lg={12} xl={12}>
-						{posts ? (
-							posts.map((post) => (
-								<Post key={post.postId} post={post} />
-							))
-						) : (
-							<p>Loading...</p>
-						)}
+						{posts
+							? posts.map((post) => (
+									<Post key={post.postId} post={post} />
+							  ))
+							: [1, 2, 3].map((item) => (
+									<Skeleton
+										key={item}
+										className='post_skeleton'
+										active
+										avatar
+									></Skeleton>
+							  ))}
 					</Col>
 					<Col xs={24} sm={24} md={24} lg={6} xl={6}>
 						Followers

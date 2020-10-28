@@ -1,13 +1,16 @@
 import React from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { Link } from 'react-router-dom';
 import { Comment, Tooltip, Avatar } from 'antd';
-import { LikeOutlined, MessageOutlined } from '@ant-design/icons';
+import { LikeOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons';
 
 import './Post.scss';
 import Actions from '../Actions/Actions';
 
 function Post({ post }) {
+	dayjs.extend(relativeTime);
+
 	const {
 		userName,
 		body,
@@ -42,15 +45,21 @@ function Post({ post }) {
 				</Link>
 			}
 			avatar={
-				<Link to={`/users/${userName}`}>
-					<Avatar src={userImage} alt={userName} />
+				<Link className='post_avatar' to={`/users/${userName}`}>
+					{userImage ? (
+						<Avatar src={userImage} alt={userName} />
+					) : (
+						<Avatar icon={<UserOutlined />} alt={userName} />
+					)}
 				</Link>
 			}
 			content={<p>{body}</p>}
 			datetime={
-				<Tooltip title={moment(createdAt).format('llll')}>
+				<Tooltip
+					title={dayjs(createdAt).format('ddd, MMM DD, YYYY h:mm a')}
+				>
 					<span className='posted_date'>
-						{moment(createdAt).fromNow()}
+						{dayjs(createdAt).fromNow()}
 					</span>
 				</Tooltip>
 			}
