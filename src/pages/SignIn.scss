@@ -32,7 +32,7 @@
 	width: 100%;
 }
 
-.ant-form-item.username_form_item {
+.ant-form-item.email_form_item {
 	margin-bottom: 10px;
 }
 
@@ -68,6 +68,8 @@
 	margin-bottom: 10px;
 }
 
-.signin_button {
+.ant-btn.signin_button {
 	width: 100%;
+	font-weight: 800;
+	color: #ffffff;
 }

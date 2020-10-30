@@ -9,11 +9,13 @@ import Post from '../components/Post/Post';
 function Home() {
 	const { Content } = Layout;
 	const [posts, setPosts] = useState(null);
-	const token = '';
+	const authToken = useState(localStorage.getItem('AuthToken'))[0];
 
 	useEffect(() => {
 		axios
-			.get('/posts', { headers: { Authorization: `Bearer ${token}` } })
+			.get('/posts', {
+				headers: { Authorization: authToken }
+			})
 			.then((res) => {
 				setPosts(res.data);
 			})
