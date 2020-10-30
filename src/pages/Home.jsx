@@ -22,7 +22,7 @@ function Home() {
 			.catch((err) => {
 				console.error(err);
 			});
-	}, []);
+	}, [authToken]);
 
 	return (
 		<div>
