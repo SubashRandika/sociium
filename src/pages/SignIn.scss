@@ -15,7 +15,7 @@
 	align-items: center;
 	justify-content: center;
 	width: 350px;
-	height: 400px;
+	height: auto;
 	background-color: #ffffff;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 -1px 0px rgba(0, 0, 0, 0.02);
 	padding: 24px;
@@ -23,26 +23,29 @@
 
 .signin_text {
 	font-size: 21px;
-	margin-top: 10px;
+	margin-top: 15px;
+	margin-bottom: 15px;
 	font-weight: 700;
 }
 
-.ant-form.login_form {
+.ant-form.signin_form {
 	padding: 0 10px;
 	width: 100%;
 }
 
-.ant-form-item.email_form_item {
-	margin-bottom: 10px;
+.ant-form.signin_form .ant-input {
+	line-height: 1;
+	margin-left: 4px;
+}
+.ant-row.ant-form-item.email_form_item,
+.ant-row.ant-form-item.password_form_item,
+.ant-row.ant-form-item.remember_form_item,
+.ant-row.ant-form-item.signin_btn_form_item {
+	margin-bottom: 15px;
 }
 
 .anticon.form_item_icon {
 	color: #c5c5c5;
-}
-
-.ant-form-item.remember_form_item {
-	margin-top: 10px;
-	margin-bottom: 15px;
 }
 
 .ant-form-item.remember_form_item .ant-form-item-control-input-content {
@@ -50,22 +53,18 @@
 	justify-content: space-between;
 }
 
-.login_signup {
+.signup_link {
 	margin-left: 10px;
 }
 
-.login_form_forgot:hover,
-.login_signup:hover {
+.signin_form_forgot:hover,
+.signup_link:hover {
 	color: #0275d8;
 	font-weight: 400;
 }
 
 .ant-form-item.signup_text_form_item {
 	margin-bottom: 0;
-}
-
-.ant-form-item.signin_btn_form_item {
-	margin-bottom: 10px;
 }
 
 .ant-btn.signin_button {

@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { Row, Col, Avatar, Form, Input, Button, Checkbox, Alert } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import './SignIn.scss';
 
 function SignIn() {
+	const initialSignInValues = { email: '', password: '', remember: false };
 	const [loading, setLoading] = useState(false);
 	const [errors, setErrors] = useState(null);
 	const history = useHistory();
@@ -17,14 +18,14 @@ function SignIn() {
 		},
 		{
 			required: true,
-			message: 'Please enter your Email'
+			message: 'Please enter your email'
 		}
 	];
 
 	const passwordValidationRules = [
 		{
 			required: true,
-			message: 'Please enter your Password'
+			message: 'Please enter your password'
 		}
 	];
 
@@ -79,13 +80,9 @@ function SignIn() {
 					/>
 					<h2 className='signin_text'>Welcome to Sociium</h2>
 					<Form
-						name='login_form'
-						className='login_form'
-						initialValues={{
-							email: '',
-							password: '',
-							remember: false
-						}}
+						className='signin_form'
+						name='signin_form'
+						initialValues={initialSignInValues}
 						onFinish={handleSignIn}
 						onFinishFailed={handleSignInFailed}
 					>
@@ -97,7 +94,7 @@ function SignIn() {
 						>
 							<Input
 								prefix={
-									<UserOutlined className='form_item_icon' />
+									<MailOutlined className='form_item_icon' />
 								}
 								placeholder='Email'
 							/>
@@ -112,7 +109,6 @@ function SignIn() {
 								prefix={
 									<LockOutlined className='form_item_icon' />
 								}
-								type='password'
 								placeholder='Password'
 							/>
 						</Form.Item>
@@ -124,7 +120,7 @@ function SignIn() {
 							>
 								<Checkbox>Remember me</Checkbox>
 							</Form.Item>
-							<Link className='login_form_forgot' to='/signin'>
+							<Link className='signin_form_forgot' to='/signin'>
 								Forgot password?
 							</Link>
 						</Form.Item>
@@ -141,7 +137,7 @@ function SignIn() {
 						<Form.Item className='signup_text_form_item'>
 							<span>Do not have an account?</span>
 							<span>
-								<Link className='login_signup' to='/signup'>
+								<Link className='signup_link' to='/signup'>
 									Sign Up
 								</Link>
 							</span>
