@@ -6,35 +6,12 @@ const logger = require('../utils/logger');
 
 const validateSignInUser = (user) => {
 	const schema = Joi.object({
-		email: Joi.string()
-			.trim()
-			.required()
-			.error((errors) => {
-				return errors.map((err) => {
-					switch (err.type) {
-						case 'any.empty':
-							return { message: 'cannot be empty.' };
-						default:
-							return {
-								message: `${err.message}`
-							};
-					}
-				});
-			}),
-		password: Joi.string()
-			.required()
-			.error((errors) => {
-				return errors.map((err) => {
-					switch (err.type) {
-						case 'any.empty':
-							return { message: 'cannot be empty.' };
-						default:
-							return {
-								message: `${err.message}`
-							};
-					}
-				});
-			})
+		email: Joi.string().trim().required().messages({
+			'string.empty': 'cannot be empty.'
+		}),
+		password: Joi.string().required().messages({
+			'string.empty': 'cannot be empty.'
+		})
 	});
 
 	return schema.validate(user);

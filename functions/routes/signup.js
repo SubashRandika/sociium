@@ -1,8 +1,19 @@
 const express = require('express');
 const Joi = require('joi');
+const passwordComplexity = require('joi-password-complexity');
 const router = express.Router();
 const { firebase, db } = require('../utils/firebaseAdmin');
 const logger = require('../utils/logger');
+
+const complexityOptions = {
+	min: 6,
+	max: 20,
+	lowerCase: 1,
+	upperCase: 1,
+	numeric: 1,
+	symbol: 1,
+	requirementCount: 4
+};
 
 const validateSignUpUser = (user) => {
 	const schema = Joi.object({
@@ -10,89 +21,21 @@ const validateSignUpUser = (user) => {
 			.trim()
 			.email({ minDomainSegments: 2 })
 			.required()
-			.error((errors) => {
-				return errors.map((err) => {
-					switch (err.type) {
-						case 'any.empty':
-							return { message: 'cannot be empty.' };
-						case 'string.email':
-							return {
-								message: 'should be valid one.'
-							};
-						default:
-							return {
-								message: `${err.message}`
-							};
-					}
-				});
+			.messages({
+				'string.empty': 'cannot be empty.',
+				'string.email': 'should be valid one.'
 			}),
-		password: Joi.string()
-			.min(6)
-			.required()
-			.regex(
-				/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,}$/
-			)
-			.strip()
-			.error((errors) => {
-				return errors.map((err) => {
-					switch (err.type) {
-						case 'any.empty':
-							return { message: 'cannot be empty.' };
-						case 'string.min':
-							return {
-								message: 'should be at least 6 characters long.'
-							};
-						case 'string.regex.base':
-							return {
-								message:
-									'must include uppercase, lowercase, digit and special characters without whitespaces.'
-							};
-						default:
-							return {
-								message: `${err.message}`
-							};
-					}
-				});
-			}),
+		password: passwordComplexity(complexityOptions),
 		confirmPassword: Joi.string()
 			.required()
 			.valid(Joi.ref('password'))
-			.strip()
-			.error((errors) => {
-				return errors.map((err) => {
-					switch (err.type) {
-						case 'any.empty':
-							return { message: 'cannot be empty.' };
-						case 'any.allowOnly':
-							return {
-								message: 'must match with the password.'
-							};
-						default:
-							return {
-								message: `${err.message}`
-							};
-					}
-				});
+			.messages({
+				'any.only': 'must match with the password.'
 			}),
-		userName: Joi.string()
-			.min(4)
-			.required()
-			.error((errors) => {
-				return errors.map((err) => {
-					switch (err.type) {
-						case 'any.empty':
-							return { message: 'cannot be empty.' };
-						case 'string.min':
-							return {
-								message: 'must have at least 4 characters.'
-							};
-						default:
-							return {
-								message: `${err.message}`
-							};
-					}
-				});
-			})
+		userName: Joi.string().min(4).required().messages({
+			'string.empty': 'cannot be empty.',
+			'string.min': 'must have at least 4 characters.'
+		})
 	});
 
 	return schema.validate(user);
