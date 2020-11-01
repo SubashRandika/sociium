@@ -116,7 +116,7 @@ function SignUp() {
 				{errors && (
 					<Alert
 						type='error'
-						message={errors.code}
+						message={`Error in ${errors.field.toLowerCase()} field`}
 						description={errors.message}
 						showIcon
 						closable

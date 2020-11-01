@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { PropTypes } from 'prop-types';
 import { Link, useHistory } from 'react-router-dom';
-import axios from 'axios';
+import { connect } from 'react-redux';
 import { Row, Col, Avatar, Form, Input, Button, Checkbox, Alert } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import './SignIn.scss';
+import { userSignIn } from '../redux/actions/userActions';
+import { clearErrorAlert } from '../redux/actions/uiActions';
 
-function SignIn() {
+function SignIn({ ui: { loading, error }, userSignIn, clearErrorAlert }) {
 	const initialSignInValues = { email: '', password: '', remember: false };
-	const [loading, setLoading] = useState(false);
-	const [errors, setErrors] = useState(null);
 	const history = useHistory();
 
 	const emailValidationRules = [
@@ -30,25 +31,12 @@ function SignIn() {
 	];
 
 	const handleSignIn = (credentials) => {
-		setLoading(true);
-
 		const userCredentials = {
 			email: credentials.email,
 			password: credentials.password
 		};
 
-		axios
-			.post('/signin', userCredentials)
-			.then((res) => {
-				localStorage.setItem('AuthToken', `Bearer ${res.data.token}`);
-				setLoading(false);
-				history.push('/');
-			})
-			.catch((err) => {
-				console.error(err.response.data);
-				setErrors(err.response.data);
-				setLoading(false);
-			});
+		userSignIn(userCredentials, history);
 	};
 
 	const handleSignInFailed = (errorInfo) => {
@@ -56,17 +44,17 @@ function SignIn() {
 	};
 
 	const handleAlertClose = (event) => {
-		setErrors(null);
+		clearErrorAlert();
 	};
 
 	return (
 		<Row className='signin_row'>
 			<Col className='signin_col' span={8} offset={8}>
-				{errors && (
+				{error && (
 					<Alert
 						type='error'
-						message={errors.code}
-						description={errors.message}
+						message={error.code}
+						description={error.message}
 						showIcon
 						closable
 						onClose={handleAlertClose}
@@ -149,4 +137,21 @@ function SignIn() {
 	);
 }
 
-export default SignIn;
+SignIn.propTypes = {
+	userSignIn: PropTypes.func.isRequired,
+	user: PropTypes.object.isRequired,
+	ui: PropTypes.object.isRequired
+};
+
+const mapStateToProps = (state) => ({
+	user: state.user,
+	ui: state.ui
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	userSignIn: (userCredentials, history) =>
+		dispatch(userSignIn(userCredentials, history)),
+	clearErrorAlert: () => dispatch(clearErrorAlert())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignIn);
