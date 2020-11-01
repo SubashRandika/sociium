@@ -138,9 +138,10 @@ function SignIn({ ui: { loading, error }, userSignIn, clearErrorAlert }) {
 }
 
 SignIn.propTypes = {
-	userSignIn: PropTypes.func.isRequired,
 	user: PropTypes.object.isRequired,
-	ui: PropTypes.object.isRequired
+	ui: PropTypes.object.isRequired,
+	userSignIn: PropTypes.func.isRequired,
+	clearErrorAlert: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
